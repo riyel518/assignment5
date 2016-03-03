@@ -8,8 +8,9 @@ using namespace std;
 
 void userMenu(trees& containers){
 
- btnode* insertNode;
- btnode* nodePosition;
+int displayCounter = 0;
+ btnode* insertNode = NULL;
+ btnode* nodePosition = NULL;
  bool found;
 
  int insertValue,
@@ -19,6 +20,7 @@ void userMenu(trees& containers){
  char selected;
 
  do{        cout << endl;
+ 			cout << "--------------------------------" << endl;
 	        cout << "Choose on the following option: " << endl;
 			cout << "I = Insert an integer" << endl;
 			cout << "D = Delete an Interge" << endl;
@@ -51,23 +53,30 @@ void userMenu(trees& containers){
 
 				cout << "Enter the integer to be search: ";
 				cin >> targetValue;
+				
 				nodePosition = FindNode(containers, found,  targetValue );
+	            
 				if(found){
  						cout << "Values Stored subtree with root " << nodePosition->data << " are: " << endl;
-						InOrdeDisplay(nodePosition, 0);
+						InOrdeDisplay(nodePosition, displayCounter);
 				}
 
 				else{
-
-						cout << "The value cannot be found " << endl;
-
+                        cout << endl;
+						cout << "Error: The value cannot be found!" << endl;
+						break;
 				}
 
 				break;
 
+				case 'E':
+				 cout << "Exiting the program!.. " << endl;	
+				
+				break;
+				
 				default:
 
-				cout << "The program will now end" << endl;
+				cout << "Error: Invalid Input" << endl;
 
 				break;
 			}
@@ -98,21 +107,14 @@ bool checkFile (trees& containers){
     int fileLenght;
     btnode* insertNode;
     int insertData;
-
+    int noContent;
+    noContent = 0;
 
    do{
           cout << "Enter the file name: ";
           cin >> fileName;
           inputData.open(fileName.c_str());
-         // inputData.seekg(0 , ios::end);
-
-         // if(inputData.tellg() == 0){
-
-            //  return false;
-
-       //   }
-
-
+     
 
      }while(!inputData.is_open());
 
@@ -124,7 +126,8 @@ bool checkFile (trees& containers){
 
 
        while(!inputData.eof()){
-
+             
+             noContent++;
              inputData >> insertData;
              insertNode = CreateNode(insertData);
 			 InsertNode(containers, insertNode);
@@ -132,10 +135,19 @@ bool checkFile (trees& containers){
           }
 
        inputData.close();
-
+ 
+       if(noContent == 0){
+       	
+       	 return false;
+       	
+       }
+      
+      else{
+      	
+      
        return true;
 
-
+     }
 }
 
 
@@ -307,15 +319,19 @@ else{
            else if (current->data > targetValue){
 
                 current = current->left;
+                foundNode = current;
            }
 
            else{
 
               current = current->right;
+              foundNode = current;
            }
 
        }// while loop
 
+     
+      
   } // end of else
 
 return foundNode;
@@ -338,132 +354,102 @@ implement: Chris Francisco
 
 void DeleteNode(trees& containers, int targetValue){
 
-btnode *current;
+bool isFound;
+
+btnode *deleteTemp = NULL;
+btnode *foundTemp;
+btnode *current = NULL;
 btnode *trailCurrent;
-bool found = false;
 
-if(IsEmpty(containers)){
 
-  cout << "Cannot delete on the empty tree" << endl;
 
-} // end of if statement
+if(containers.root == NULL){
+
+    cout << "Cannot delete on the empty tree" << endl;
+
+}
 
 else{
-       current = containers.root;
-       trailCurrent = containers.root;
 
-       while(current != NULL && !found){
+foundTemp  = FindNode(containers, isFound, targetValue);
 
-           if(current->data == targetValue){
+if(isFound){
 
-               found = true;
+     if ((foundTemp->left == NULL) && (foundTemp->right == NULL) ){
+		  
+		
+             delete foundTemp;
+             foundTemp = NULL;
+          
+     } // end else
 
-           } // end of else statment
+    else if (foundTemp->left == NULL) {
 
-          else{
+          
+		   deleteTemp = foundTemp;
+           foundTemp = foundTemp->right;    
+           delete deleteTemp;
+           deleteTemp = NULL;
+           
 
-                trailCurrent = current;
 
-                if (current->data > targetValue){
+    } // end of else if
 
-                    current = current->left;
+    else if (foundTemp-> right == NULL){
 
-                }// end if
+		
+ 		   deleteTemp = foundTemp;
+           foundTemp = foundTemp->left;       
+           delete deleteTemp;
+           deleteTemp = NULL;
+      
 
-                else{
-                      current = current->right;
 
-                } // end of else
+    } // end of else if
 
-          } //ed of else
-
-       }// while loop
-
-if(current == NULL){
-
-   cout << "The delete item is not in the tree. " << endl;
-
+    else{
+    	
+    	
+    	
+    	     current = foundTemp->left;
+    	     trailCurrent = NULL;
+    	     
+    	     while(current->right != NULL){
+    	     	  
+    	     	 trailCurrent = current;
+    	     	 current = current->right;
+    	     	
+    	     } // end while
+    	     
+    	     foundTemp->data = current->data;
+    	     
+    	     if(trailCurrent == NULL){
+    	     	
+    	     	foundTemp->left = current->left;
+    	     	
+    	     }
+    	     
+    	     else{
+    	     	
+    	     	trailCurrent->right = current->left;
+    	     }
+			
+			FreeNodes(current); 
+			delete current;
+			current = NULL;
+			
+    } // end of else 
 }
 
-else if (found){
+else{
 
-  if(current == containers.root){
-    deleteFromTree(containers.root);
-  }
-  else if(trailCurrent->data > targetValue){
-    deleteFromTree(trailCurrent->left);
-  }
-  else{
-    deleteFromTree(trailCurrent->right);
-  }
+    cout << "Msg: The delete item is not in the tree!" << endl;
 
-  } // end of else if
+    }
 
-} // end of function;
+  }
 
 }
-/**************************************************************
-FUNCTION: deleteFromTree
-DESCRIPTION: succesfully delete selected node from the tree
-INPUT: N/A
-OUTPUT: N/A
-CALLS TO: N/A
-implement: Chris Francisco
-**************************************************************/
-
-void deleteFromTree(btnode* deletedNode){
-
-  btnode* current;
-  btnode* trailCurrent;
-  btnode* temp;
-
-  if(deletedNode == NULL){
-     cout << "Error: The node to be deleted is NULL." << endl;
-  }
-
-  else if (deletedNode->left == NULL & deletedNode->right == NULL){
-     temp = deletedNode;
-     deletedNode = NULL;
-     delete temp;
-  }
-
-  else if (deletedNode->left == NULL){
-      temp = deletedNode;
-      deletedNode = temp->right;
-      delete temp;
-  }
-  else if(deletedNode->right == NULL){
-     temp = deletedNode;
-     deletedNode = temp->left;
-     delete temp;
-  }
-
-  else{
-
-      current = deletedNode->left;
-      trailCurrent = NULL;
-
-      while(current->right != NULL){
-        trailCurrent = current;
-        current = current->right;
-
-      }// end while loop
-
-      deletedNode->data = current->data;
-
-      if (trailCurrent == NULL){
-          deletedNode->left = current->left;
-      }
-      else{
-        trailCurrent->right = current->left;
-      }
-
-      delete current;
-
-  } // end of else
-
-} // end of function
-
 
 /**************************************************************
 FUNCTION: InOrdeDisplay
@@ -475,57 +461,46 @@ CALLS TO: N/A
 implement: Chris Francisco
 **************************************************************/
 
-void InOrdeDisplay(btnode *noded, int counter){
+void InOrdeDisplay(btnode *noded, int& counter){
+ 
+
+
+ 		if(noded != NULL){
+ 			
+ 			InOrdeDisplay(noded->left, counter);
+ 			
+ 			if(counter < DISPLAY_LINE){
+ 			
+ 			
+ 			cout << setw(TAB) << noded->data << " ";
+ 			counter++;
+ 			
+ 		    }
+ 		   
+ 		    else{
+ 		    
+ 		      
+ 		      cout << setw(TAB) << noded->data << " ";
+			  cout << endl;	
+ 		      counter = 0;
+ 		    
+ 	      	}
+ 			
+ 			InOrdeDisplay(noded->right, counter);
+ 		
+ 			
+ 		}
+
+
+
+  
+  }
+  
 
 
 
 
-   if (noded != NULL){
 
-      counter ++;
-      InOrdeDisplay(noded->left,  counter);
-
-      if(counter != DISPLAY_LINE){
-
-      cout << setw(TAB) << noded->data << " ";
-
-     }
-
-     else{
-        
-        cout << setw(TAB) << noded->data << " ";
-     	cout << endl;
-     	counter = 0;
-
-     }
-
-
-      InOrdeDisplay(noded->right,  counter);
-   }
-
-
-
-}
-
-/**************************************************************
-FUNCTION: FreeNodes
-DESCRIPTION: recursively deallocates all dynamic memory allocated
-to nodes in the binary search tree
-INPUT: N/A
-OUTPUT: N/A
-CALLS TO: N/A
-implement: Chris Francisco
-**************************************************************/
-
-void FreeNodes(btnode *nodeToFree, btnode *nodeRetain){
-
-btnode *temp;
-
-  temp = nodeToFree;
-  nodeToFree = nodeRetain;
-  delete temp;
-
-}
 
 /**************************************************************
 FUNCTION: DestroyTree
@@ -539,24 +514,27 @@ implement: Chris Francisco
 
 void DestroyTree(trees& treetoDestroy){
 
-        destroy(treetoDestroy.root);
+        FreeNodes(treetoDestroy.root);
+        
 }
 
 /**************************************************************
-FUNCTION: destroy
-DESCRIPTION: recursively destroy every single node in the tree
+FUNCTION: FreeNodes
+DESCRIPTION: recursively deallocates all dynamic memory allocated
+to nodes in the binary search tree
 INPUT: N/A
 OUTPUT: N/A
 CALLS TO: N/A
 implement: Chris Francisco
 **************************************************************/
 
-void destroy(btnode *toDestroy){
+void FreeNodes(btnode *toDestroy){
 
       if(toDestroy != NULL){
-
-          destroy(toDestroy->left);
-          destroy(toDestroy->right);
+         
+          
+          FreeNodes(toDestroy->left);
+          FreeNodes(toDestroy->right);
           delete toDestroy;
           toDestroy = NULL;
 

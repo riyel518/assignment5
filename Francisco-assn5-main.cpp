@@ -10,33 +10,35 @@ int main(){
 	trees container;
 	bool notEmpty;
 	btnode *roots = NULL;
+	int displayCounter;
+	
+	
+	displayCounter = 0;
 
 	container = CreateTree();
     notEmpty = checkFile (container);
 
-	//if(notEmpty){
+	if(notEmpty){
 
 
 	 roots = container.root;
 
 
 	 cout << "Values stored in entire binary search tree are: " << endl;
-	 InOrdeDisplay(roots, 0);
+	 InOrdeDisplay(roots, displayCounter);
      cout << endl;
-     DeleteNode(container, 9);
-     InOrdeDisplay(roots, 0);
 		
-//	}
+	}
 
-//	else{
+	else{
 
-//	cout << "Binary search tree is empty! " << endl;
+	cout << "Binary search tree is empty! " << endl;
 
-//	}
+	}
 
-    //userMenu(container);
-
-
+    userMenu(container);
+    DestroyTree(container);
+   
 
 	return 0;
 }

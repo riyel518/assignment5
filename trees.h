@@ -6,8 +6,8 @@
 //node structure for binary trees
 
 const int NO_FILE = 0;
-const int DISPLAY_LINE = 10;
-const int TAB = 3;
+const int DISPLAY_LINE = 9;
+const int TAB = 6;
 struct btnode{
 
      int data;
@@ -44,9 +44,9 @@ void DeleteNode(trees& containers, int targetValue);
 
 void deleteFromTree(btnode* deletedNode);
 
-void InOrdeDisplay(btnode *noded, int counter);
+void InOrdeDisplay(btnode *noded, int& counter);
 
-void FreeNodes(btnode *nodeToFree, btnode *nodeRetain);
+void FreeNodes(btnode *nodeToFree);
 
 void DestroyTree(trees& treetoDestroy);
 
